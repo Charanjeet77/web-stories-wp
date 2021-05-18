@@ -40,6 +40,7 @@ export const ELEMENT_TYPE = {
   SHAPE: 'shape',
   TEXT: 'text',
   VIDEO: 'video',
+  GIF: 'gif',
 };
 
 export const ACTION_TEXT = {
@@ -79,14 +80,25 @@ const useQuickActions = () => {
     [setHighlights]
   );
 
-  const {
-    handleFocusPageBackground,
-    handleFocusMediaPanel,
-    handleFocusTextSetsPanel,
-  } = useMemo(
+  const handleFocusMediaPanel = useMemo(() => {
+    const idOrigin = selectedElements?.[0]?.resource?.id
+      ?.toString()
+      .split(':')?.[0];
+    const is3PGif =
+      !idOrigin &&
+      selectedElements?.[0]?.resource?.type?.toLowerCase() === 'gif';
+    const is3PVideo = idOrigin?.toLowerCase() === 'media/coverr';
+    const is3PImage = idOrigin?.toLowerCase() === 'media/unsplash';
+
+    const panelToFocus =
+      is3PImage || is3PVideo || is3PGif ? states.MEDIA3P : states.MEDIA;
+
+    return handleFocusPanel(panelToFocus);
+  }, [handleFocusPanel, selectedElements]);
+
+  const { handleFocusPageBackground, handleFocusTextSetsPanel } = useMemo(
     () => ({
       handleFocusPageBackground: handleFocusPanel(states.PAGE_BACKGROUND),
-      handleFocusMediaPanel: handleFocusPanel(states.MEDIA),
       handleFocusTextSetsPanel: handleFocusPanel(states.TEXT),
     }),
     [handleFocusPanel]
@@ -128,8 +140,7 @@ const useQuickActions = () => {
       {
         Icon: PictureSwap,
         label: ACTION_TEXT.CHANGE_BACKGROUND_MEDIA,
-        onClick: () => console.log('change bg media'),
-        //handleFocusMediaPanel(backgroundElement?.id),
+        onClick: handleFocusMediaPanel(backgroundElement?.id),
       },
       {
         Icon: CircleSpeed,
@@ -169,7 +180,7 @@ const useQuickActions = () => {
 
   if (
     isBackgroundElementMedia &&
-    [ELEMENT_TYPE.IMAGE, ELEMENT_TYPE.VIDEO].indexOf(
+    [ELEMENT_TYPE.IMAGE, ELEMENT_TYPE.VIDEO, ELEMENT_TYPE.GIF].indexOf(
       selectedElements?.[0]?.type
     ) > -1
   ) {
