@@ -102,6 +102,12 @@ function CustomStyles() {
                 bottom: 0;
                 margin: 0;
               }
+
+              @media (prefers-reduced-motion: no-preference) {
+                .animation-wrapper {
+                  transform: var(--ws-initial-transform);
+                }
+              }
               `,
       }}
     />

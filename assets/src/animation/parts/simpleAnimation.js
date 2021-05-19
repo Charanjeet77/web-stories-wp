@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
  * Internal dependencies
  */
 import { AnimationOutput, WithAnimation } from '../outputs';
-import getInitialStyleFromKeyframes from '../utils/getInitialStyleFromKeyframes';
+import getInitialTransformFromKeyframes from '../utils/getInitialTransformFromKeyframes';
 import createKeyframeEffect from '../utils/createKeyframeEffect';
 import { WAAPIAnimationProps, AMPAnimationProps } from './types';
 import FullSizeAbsolute from './components/fullSizeAbsolute';
@@ -73,24 +73,32 @@ function SimpleAnimation(
   WAAPIAnimation.propTypes = WAAPIAnimationProps;
 
   const AMPTarget = function ({ children, style = {} }) {
-    const initialStylesFromKeyframes = targetLeafElement
+    // TODO: Support opacity as well?
+    const initialTransformFromKeyframes = targetLeafElement
       ? {}
-      : getInitialStyleFromKeyframes(keyframes);
+      : getInitialTransformFromKeyframes(keyframes);
+    const animationStyle = {
+      '--ws-initial-transform': initialTransformFromKeyframes,
+    };
     const options = useClippingContainer
       ? {
           useClippingContainer: useClippingContainer,
           style,
-          animationStyle: initialStylesFromKeyframes,
+          animationStyle,
         }
       : {
           style: {
             ...style,
-            ...initialStylesFromKeyframes,
+            ...animationStyle,
           },
         };
 
     return (
-      <WithAnimation id={`anim-${id}`} {...options}>
+      <WithAnimation
+        id={`anim-${id}`}
+        className="animation-wrapper"
+        {...options}
+      >
         {children}
       </WithAnimation>
     );
