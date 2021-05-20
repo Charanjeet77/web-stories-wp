@@ -57,7 +57,7 @@ function NavLayer() {
             <ContextMenu
               isAlwaysVisible
               isIconMenu
-              disableTabNavigation
+              disableControlledTabNavigation
               items={quickActions}
             />
           </QuickActionsArea>
